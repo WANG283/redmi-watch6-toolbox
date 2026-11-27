@@ -1,0 +1,13 @@
+{
+  "name": "redmi-watch6-toolbox",
+  "version": "1.0.0",
+  "description": "Redmi Watch 6 腕上工具箱 Vela 快应用：百分秒秒表（带计次）+ 全屏手电筒（拉满亮度并保持常亮），纯离线、无网络权限。",
+  "scripts": {
+    "build": "aiot build",
+    "release": "aiot release",
+    "watch": "aiot watch"
+  },
+  "devDependencies": {
+    "@aiot-toolkit/aiot": "^2.0.0"
+  }
+}
