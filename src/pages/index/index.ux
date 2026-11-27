@@ -1,0 +1,49 @@
+<template>
+  <div class="page" style="background-color: {{ lightOn ? '#ffffff' : '#000000' }}">
+    <text class="title" if="{{ !lightOn }}">腕上工具箱</text>
+    <text class="sw" if="{{ !lightOn }}">{{ swText }}</text>
+    <div class="row" if="{{ !lightOn }}">
+      <text class="btn primary" onclick="swToggle">{{ swRunning ? '暂停' : '秒表' }}</text>
+      <text class="btn" onclick="swLap">计次 {{ laps.length }}</text>
+    </div>
+    <list class="laps" if="{{ !lightOn }}">
+      <list-item type="lap" for="lap in laps"><text class="lap">{{ lap }}</text></list-item>
+    </list>
+    <text class="btn light" onclick="toggleLight">{{ lightOn ? '关闭手电' : '手电筒' }}</text>
+  </div>
+</template>
+<style>
+  .page { flex-direction: column; align-items: center; width: 432px; height: 514px; padding: 28px; }
+  .title { color: #fff; font-size: 36px; }
+  .sw { color: #fff; font-size: 84px; margin: 18px 0; }
+  .row { flex-direction: row; }
+  .btn { width: 160px; height: 68px; border-radius: 34px; background-color: #1c1c1e; color: #fff; font-size: 30px; text-align: center; margin: 0 8px 14px; }
+  .primary { background-color: #0a84ff; }
+  .light { background-color: #ffd60a; color: #000; }
+  .laps { flex: 1; width: 360px; }
+  .lap { color: #8a8a8a; font-size: 26px; text-align: center; }
+</style>
+<script>
+import brightness from "@system.brightness"
+export default {
+  private: { startAt: 0, elapsed: 0, swRunning: false, timer: null, laps: [], lightOn: false, swText: "00:00.0" },
+  fmt(ms) {
+    const t = Math.floor(ms / 100)
+    return String(Math.floor(t / 600)).padStart(2, "0") + ":" + String(Math.floor(t / 10) % 60).padStart(2, "0") + "." + (t % 10)
+  },
+  swToggle() {
+    if (this.swRunning) { clearInterval(this.timer); this.swRunning = false }
+    else {
+      this.startAt = Date.now() - this.elapsed; this.swRunning = true
+      this.timer = setInterval(() => { this.elapsed = Date.now() - this.startAt; this.swText = this.fmt(this.elapsed) }, 100)
+    }
+  },
+  swLap() { if (this.elapsed) this.laps.unshift("第" + (this.laps.length + 1) + "次  " + this.fmt(this.elapsed)) },
+  toggleLight() {
+    this.lightOn = !this.lightOn
+    brightness.setValue({ value: this.lightOn ? 255 : 120 })
+    if (this.lightOn) brightness.setKeepScreenOn({ keepScreenOn: true })
+  },
+  onDestroy() { if (this.timer) clearInterval(this.timer) }
+}
+</script>
